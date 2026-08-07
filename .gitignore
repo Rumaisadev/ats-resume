@@ -1,0 +1,71 @@
+# =====================
+# Next.js / Frontend
+# =====================
+
+# Dependencies
+**/node_modules/
+**/.next/
+frontend/node_modules/
+
+# Next.js build output
+frontend/.next/
+frontend/out/
+
+# Environment variables
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# Vercel
+frontend/.vercel/
+
+
+# =====================
+# FastAPI / Backend
+# =====================
+
+# Virtual environment
+backend/venv/
+backend/.venv/
+
+# Python cache
+backend/__pycache__/
+backend/**/__pycache__/
+
+# Compiled Python files
+backend/*.py[cod]
+backend/**/*.py[cod]
+
+# Environment variables
+backend/.env
+
+# Testing
+backend/.pytest_cache/
+backend/.coverage
+
+# Logs
+backend/*.log
+
+
+# =====================
+# General
+# =====================
+
+# OS files
+.DS_Store
+
+# IDE settings
+.vscode/
+.idea/
+
+# Environment files anywhere
+.env
+.env.*

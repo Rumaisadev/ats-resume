@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+/* Force Tailwind dark mode to work only with .dark class */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+
+  /* Main colors */
+  --color-background: #ffffff;
+  --color-surface: #f8fafc;
+  --color-card: #ffffff;
+
+  /* Brand */
+  --color-primary: #f97316;
+  --color-primary-hover: #ea580c;
+  --color-primary-foreground: #ffffff;
+
+  /* Secondary */
+  --color-secondary: #111111;
+  --color-secondary-hover: #262626;
+  --color-secondary-foreground: #ffffff;
+
+  /* Text */
+  --color-text: #111827;
+  --color-text-muted: #6b7280;
+
+  /* Borders */
+  --color-border: #e5e7eb;
+
+  /* Inputs */
+  --color-input: #f9fafb;
+
+  /* Status colors */
+  --color-success: #16a34a;
+  --color-warning: #f59e0b;
+  --color-error: #dc2626;
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(400%);
+  }
+}
+
+@theme {
+  --animate-scan: scan 3s ease-in-out infinite;
+}
