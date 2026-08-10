@@ -1,3 +1,5 @@
+import { Flag } from "@/types/types";
+
 export const footerLinks = [
   {
     title: "Product",
@@ -71,3 +73,10 @@ export const deliverables = [
   "Formatting & Layout Review",
   "Skills Gap Analysis",
 ];
+
+export const flagLabels: Record<Flag["type"], string> = {
+  weak_verb: "Weak verb",
+  unquantified: "No measurable outcome",
+  passive_voice: "Passive voice",
+  unclear: "Unclear",
+};
