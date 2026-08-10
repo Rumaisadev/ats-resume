@@ -3,7 +3,7 @@ import os
 import requests
 from .extract_sections import extract_experience_bullets
 from app.core.config import config
-
+import uuid
 GEMINI_API_KEY = config("GEMINI_API_KEY")
 print("KEY LOADED:", GEMINI_API_KEY[:8] if GEMINI_API_KEY else "MISSING")
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent"
@@ -11,7 +11,7 @@ PROMPT_INSTRUCTIONS = """You are a resume reviewer. For each bullet point, check
 
 Only report bullets that have one or both of these problems — skip any bullet that's already strong.
 
-For each flagged bullet, provide the original line and a rewritten version. IMPORTANT: Never invent specific numbers, percentages, or metrics that are not present in or directly implied by the original text. If the bullet lacks a measurable outcome and no real number can be inferred from the given text, rewrite it with a stronger verb only, and instead of a fake number, insert a bracketed placeholder like [add a specific number or percentage here] to prompt the user to fill in their own real data — never fabricate one.
+For each flagged bullet, provide the original line and one rewritten version using a strong action verb. If a specific number or percentage would strengthen it but isn't present in the original text, do NOT invent one — instead, write the sentence naturally with the placeholder text "[add a specific number or percentage]" in place of where a real number would go.
 
 Respond ONLY with valid JSON, in exactly this structure, with no extra text before or after:
 {
@@ -51,11 +51,10 @@ def review_bullets(resume_text: str) -> dict:
             raw_text = raw_text.replace("json\n", "", 1).strip()
 
         parsed = json.loads(raw_text)
-        return {
-            "reviewed": True,
-            "flags": parsed.get("flags", []),
-            "summary": parsed.get("summary", ""),
-        }
+        for flag in parsed.get("flags", []):
+            flag["id"] = str(uuid.uuid4())
+
+        return {**parsed, "reviewed": True}
 
     except (requests.RequestException, KeyError, json.JSONDecodeError) as e:
         print("LLM REVIEW FAILED:", type(e).__name__, str(e))
