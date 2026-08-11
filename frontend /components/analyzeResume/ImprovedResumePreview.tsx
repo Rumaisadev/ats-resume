@@ -1,15 +1,30 @@
+import { applyEdits } from "@/lib/api";
 import { Flag, BulletState } from "@/types/types";
 
 export function ImprovedResumePreview({
   flags,
   bulletState,
   updateBulletText,
+  originalFile,
 }: {
   flags: Flag[];
   bulletState: Record<string, BulletState>;
   updateBulletText: (id: string, text: string) => void;
+  originalFile: File | null;
 }) {
-  const hasChanges = Object.values(bulletState).some((state) => state.accepted);
+  console.log("ImprovedResumePreview originalFile:", originalFile);
+  const hasChanges = flags.some((flag) => {
+    const state = bulletState[flag.id];
+
+    if (!state?.accepted) {
+      return false;
+    }
+
+    const currentText = state.currentText ?? flag.line;
+
+    return currentText !== flag.line;
+  });
+
   const bulletLines = flags.map((flag) => ({
     id: flag.id,
     text: bulletState[flag.id]?.currentText ?? flag.line,
@@ -28,7 +43,24 @@ export function ImprovedResumePreview({
   );
 
   const handleCopy = () => navigator.clipboard.writeText(compiledText);
-
+  const handleDownload = async () => {
+    if (!originalFile) return;
+    console.log("originalFile:", originalFile);
+    console.log("file name:", originalFile.name);
+    console.log("file size:", originalFile.size);
+    console.log("file type:", originalFile.type);
+    try {
+      const blob = await applyEdits(originalFile, flags, bulletState);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "updated_resume.docx";
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+    }
+  };
   return (
     <div className="rounded-2xl border border-orange-200 bg-orange-50/30 p-6">
       <h3 className="font-semibold text-gray-900">Your updated content</h3>
@@ -36,11 +68,17 @@ export function ImprovedResumePreview({
         Based on the suggestions and skills you&apos;ve accepted.
       </p>
 
-      <div className="mt-4 rounded-xl bg-white p-4 font-mono text-sm text-gray-700 shadow-sm">
+      <div
+        className={`mt-4 rounded-xl p-4 font-mono text-sm text-gray-700 shadow-sm transition-colors ${
+          hasUnfilledPlaceholders
+            ? "border border-orange-200 bg-orange-50"
+            : "border border-gray-100 bg-white"
+        }`}
+      >
+        {" "}
         <div className="font-semibold tracking-wide text-gray-500">
           EXPERIENCE
         </div>
-
         <div className="mt-2 space-y-1.5">
           {bulletLines.map((bullet) => (
             <div key={bullet.id} className="flex items-start gap-2">
@@ -79,6 +117,14 @@ export function ImprovedResumePreview({
         </button>
 
         <button
+          onClick={() => {
+            console.log("DOWNLOAD BUTTON CLICKED");
+            console.log("hasChanges:", hasChanges);
+            console.log("originalFile:", originalFile);
+            console.log("bulletState:", bulletState);
+
+            handleDownload();
+          }}
           disabled={!hasChanges}
           className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-40"
         >

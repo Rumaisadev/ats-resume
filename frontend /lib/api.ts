@@ -1,3 +1,5 @@
+import { BulletState, Flag } from "@/types/types";
+
 export async function analyzeResume(resumeFile: File, jobDescription: string) {
   const formData = new FormData();
   formData.append("resumeFile", resumeFile);
@@ -21,4 +23,33 @@ export async function analyzeResume(resumeFile: File, jobDescription: string) {
   }
 
   return res.json();
+}
+
+export async function applyEdits(
+  originalFile: File,
+  flags: Flag[],
+  bulletState: Record<string, BulletState>,
+) {
+  const acceptedFlags = flags
+    .map((flag) => {
+      const currentText = bulletState[flag.id]?.currentText ?? flag.line;
+      return { line: flag.line, suggestion: currentText };
+    })
+    .filter((entry) => entry.suggestion !== entry.line);
+
+  const formData = new FormData();
+  formData.append("resumeFile", originalFile);
+  formData.append("acceptedFlags", JSON.stringify(acceptedFlags));
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/apply-edits`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => null);
+    throw new Error(errorData?.detail ?? "Failed to generate updated resume.");
+  }
+
+  return res.blob();
 }

@@ -32,13 +32,13 @@ export default function AnalyzePage() {
   const formSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
-    const fileInput = form.elements.namedItem("resumeFile") as HTMLInputElement;
-    const file = fileInput.files?.[0];
+    // const fileInput = form.elements.namedItem("resumeFile") as HTMLInputElement;
+    // const file = fileInput.files?.[0];
     const jobDescription = (
       form.elements.namedItem("jobDescription") as HTMLTextAreaElement
     ).value;
 
-    if (!file) {
+    if (!selectedFile) {
       setError("Please select a resume file.");
       return;
     }
@@ -48,7 +48,7 @@ export default function AnalyzePage() {
     setResult(null);
 
     try {
-      const data = await analyzeResume(file, jobDescription);
+      const data = await analyzeResume(selectedFile, jobDescription);
       setResult(data);
     } catch (err: any) {
       setError(err.message);
@@ -70,6 +70,7 @@ export default function AnalyzePage() {
     setError("");
     setSelectedFile(file);
   };
+  console.log("AnalyzePage selectedFile:", selectedFile);
 
   return (
     <div className="min-h-screen bg-white px-6 pb-20 pt-32">
@@ -225,7 +226,9 @@ export default function AnalyzePage() {
                 </div>
               </div>
             ) : (
-              <ResultsView result={result} />
+              <>
+                <ResultsView result={result} originalFile={selectedFile} />
+              </>
             )}
           </div>
         )}

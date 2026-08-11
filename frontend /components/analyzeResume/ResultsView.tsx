@@ -8,7 +8,13 @@ import { ImprovedResumePreview } from "./ImprovedResumePreview";
 import { Flag, AnalysisResult, BulletState } from "../../types/types";
 import { flagLabels } from "@/consts";
 
-export default function ResultsView({ result }: { result: AnalysisResult }) {
+export default function ResultsView({
+  result,
+  originalFile,
+}: {
+  result: AnalysisResult;
+  originalFile: File | null;
+}) {
   const { checks, keywords } = result;
 
   const [bulletState, setBulletState] = useState<Record<string, BulletState>>(
@@ -43,7 +49,7 @@ export default function ResultsView({ result }: { result: AnalysisResult }) {
 
   const hasJobDescription = result.job_description_length > 0;
   const hasTrackedSkills = keywords.required_skills.length > 0;
-
+  console.log("ResultsView originalFile:", originalFile);
   return (
     <div className="mx-auto max-w-6xl">
       {/* Header */}
@@ -270,6 +276,7 @@ export default function ResultsView({ result }: { result: AnalysisResult }) {
             flags={result.flags}
             bulletState={bulletState}
             updateBulletText={updateBulletText}
+            originalFile={originalFile}
           />
         </div>
       )}
